@@ -1,0 +1,12 @@
+.file-part {
+    margin: 1em 0;
+    padding: 1em;
+    border: 2px solid grey;
+    border-radius: 1em;
+}
+
+.file-part-row .property em {
+    background: black;
+    padding: 3px 8px;
+    border-radius: 10px;
+}

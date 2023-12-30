@@ -1,6 +1,10 @@
+import { useState } from 'react';
 import { parseExcelFile } from '../../utils/excelParser';
+import { FilePreview } from '../FilePreview';
 
 export function FileChooser() {
+
+  const [files, setFiles] = useState<unknown[][][]>([]);
 
   const inputId = crypto.randomUUID();
   const acceptedFileTypes = [
@@ -9,7 +13,8 @@ export function FileChooser() {
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   ];
 
-  function handleFileInput(event: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileInput(event: React.ChangeEvent<HTMLInputElement>) {
+    let newFiles: any[][][] = [];
     if (event.target.files) {
       for (let i = 0; i < event.target.files.length; i++) {
         switch (event.target.files[i].type) {
@@ -18,7 +23,8 @@ export function FileChooser() {
             break;
           case "application/vnd.ms-excel":
           case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-            parseExcelFile(event.target.files[i]);
+            const workbooks = await parseExcelFile(event.target.files[i]);
+            newFiles.push(workbooks);
             break;
           default:
             console.log("Ogiltigt filformat");
@@ -26,16 +32,23 @@ export function FileChooser() {
         }
       }
     }
+
+    setFiles(newFiles);
   }
 
   return (
-    <div className="form-field">
-      <label htmlFor={inputId}>Välj fil med pengahistorik</label>
-      <input type="file" 
-             id={inputId} 
-             name={inputId} 
-             onChange={handleFileInput}
-             accept={acceptedFileTypes.join()} />
+    <div>
+      <div className="form-field">
+        <label htmlFor={inputId}>Välj fil med pengahistorik</label>
+        <input type="file" 
+              id={inputId} 
+              name={inputId} 
+              onChange={handleFileInput}
+              accept={acceptedFileTypes.join()} />
+      </div>
+      <div className="file-preview">
+        {files.map(file => <FilePreview parts={file} />)}
+      </div>
     </div>
   );
 }
